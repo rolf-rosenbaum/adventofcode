@@ -27,8 +27,3 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core:3.11.1")
 }
-
-application {
-    // Define the main class for the application.
-    mainClassName = "christmas.tree.AppKt"
-}
