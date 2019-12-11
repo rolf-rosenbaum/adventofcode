@@ -9,8 +9,6 @@ fun main(args: Array<String>) {
 }
 
 class StationLocationOptimizer(private val fileName: String) {
-
-
     val asteroidMap = readInputData()
         get() = field
 
@@ -18,16 +16,16 @@ class StationLocationOptimizer(private val fileName: String) {
         val asteroidMap = mutableSetOf<Asteroid>()
 
         javaClass.classLoader.getResourceAsStream(fileName)
-            .reader()
-            .readText()
-            .split("\n")
-            .mapIndexed { y, line ->
-                line.mapIndexed { x, char ->
-                    if (char == '#') {
-                        asteroidMap.add(Asteroid(x, y))
+                .reader()
+                .readText()
+                .split("\n")
+                .mapIndexed { y, line ->
+                    line.mapIndexed { x, char ->
+                        if (char == '#') {
+                            asteroidMap.add(Asteroid(x, y))
+                        }
                     }
                 }
-            }
         return asteroidMap
     }
 
@@ -40,9 +38,7 @@ class StationLocationOptimizer(private val fileName: String) {
 
         asteroidMap.minusElement(asteroid).map { other ->
 
-            val sightIsBlockedBetween = asteroidMap.any { it.isInLineOfSightBetween(asteroid, other) }
-
-            if (sightIsBlockedBetween)
+            if (asteroidMap.any { it.isInLineOfSightBetween(asteroid, other) })
                 result--
         }
 
@@ -57,6 +53,26 @@ class StationLocationOptimizer(private val fileName: String) {
             it.visibleCounter
         }!!
     }
+
+    fun vaporize(laserStation: Asteroid) {
+        val maxX = asteroidMap.maxBy(Asteroid::x)?.x
+        val maxY = asteroidMap.maxBy(Asteroid::y)?.y
+
+        var currentX = laserStation.x
+        var currentY = laserStation.y
+        val map = asteroidMap.toMutableSet()
+        while (map.size > 1) {
+
+            for (yPos in currentY downTo 0) {
+                val asteroid = Asteroid(currentX, yPos)
+                if (map.contains(asteroid)) {
+                    if (! map.any { it.isInLineOfSightBetween(asteroid, laserStation) }) {
+                        map.remove(asteroid)
+                    }
+                }
+            }
+        }
+    }
 }
 
 data class Asteroid(val x: Int, val y: Int, var visibleCounter: Int = 0) {
@@ -70,8 +86,8 @@ data class Asteroid(val x: Int, val y: Int, var visibleCounter: Int = 0) {
     }
 
     private fun isInDifferentDirection(asteroid: Asteroid, other: Asteroid): Boolean {
-        return (x - asteroid.x).sign != (x-other.x).sign ||
-                (y - asteroid.y).sign != (y-other.y).sign
+        return (x - asteroid.x).sign != (x - other.x).sign ||
+                (y - asteroid.y).sign != (y - other.y).sign
     }
 
     fun isInLineOfSightBetween(a: Asteroid, b: Asteroid): Boolean {
@@ -99,7 +115,7 @@ data class Vector(val x: Int, val y: Int) {
         if (y == 0) {
             return other.y == 0
         }
-        return x / gcd(x,y) == other.x / gcd(other.x, other.y) && y / gcd(x,y) == other.y / gcd(other.x, other.y)
+        return x / gcd(x, y) == other.x / gcd(other.x, other.y) && y / gcd(x, y) == other.y / gcd(other.x, other.y)
 
     }
 
