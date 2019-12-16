@@ -64,19 +64,21 @@ class StationLocationOptimizer(private val fileName: String) {
 
         val vaporized = mutableListOf<Asteroid>()
         val map = asteroidMap.toMutableSet()
+        var goner: Asteroid? = null
         while (map.size > 1) {
-            val goner = findNextToVaporize(map, laserStation)
+            goner = findNextToVaporize(map, laserStation, goner)
             map.remove(goner)
-            vaporized.add(goner)
+            vaporized.add(goner.copy(visibleCounter = 0))
         }
         return vaporized
     }
 
-    fun findNextToVaporize(map: Set<Asteroid>, laserStation: Asteroid): Asteroid {
+    fun findNextToVaporize(map: Set<Asteroid>, laserStation: Asteroid, last: Asteroid?): Asteroid {
 
+        val lastAngle = if(last == null) PI else PI - (last - laserStation).angle()
         return map.minusElement(laserStation)
             .filter { it.isVisbleFrom(map, laserStation) }
-            .maxBy { (it - laserStation).angle() }!!
+            .minBy { lastAngle - (it - laserStation).angle() }!!
     }
 
     fun Asteroid.isVisbleFrom(map: Set<Asteroid>, other: Asteroid): Boolean {

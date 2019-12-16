@@ -82,14 +82,14 @@ class StationLocationOptimizerTest {
     @Test
     fun `find next to vaporize`() {
         val optimizer = StationLocationOptimizer("testmap3.txt")
-        assertThat(optimizer.findNextToVaporize(optimizer.asteroidMap.toMutableSet(), Asteroid(2,2))).isEqualTo(Asteroid(4,0))
+        assertThat(optimizer.findNextToVaporize(optimizer.asteroidMap.toMutableSet(), Asteroid(2,2), null)).isEqualTo(Asteroid(4,0))
     }
 
     @Test
     fun vaporizeField() {
 
-//        val optimizer = StationLocationOptimizer("testmap3.txt")
-//        assertThat(optimizer.vaporize()).isEqualTo(listOf(Asteroid(3,3), Asteroid(2,2), Asteroid(1,1), Asteroid(0,0)))
+        val optimizer = StationLocationOptimizer("testmap3.txt")
+        assertThat(optimizer.vaporize()).isEqualTo(listOf(Asteroid(3,3), Asteroid(2,2), Asteroid(1,1), Asteroid(0,0)))
 
         val optimizer2 = StationLocationOptimizer("largeMap.txt")
         val list = optimizer2.vaporize()
