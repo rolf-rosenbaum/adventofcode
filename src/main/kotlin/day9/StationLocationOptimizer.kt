@@ -1,31 +1,35 @@
 package day9
 
+import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.sign
 
 fun main(args: Array<String>) {
     val optimizer = StationLocationOptimizer("map.txt")
 
     println("Best location is ${optimizer.findBestAsteroid()}")
+    val no200 = optimizer.vaporize().get(199)
+    println("200th Asteroid destroyed is ${no200.x *100 + no200.y}")
+
 }
 
 class StationLocationOptimizer(private val fileName: String) {
     val asteroidMap = readInputData()
-        get() = field
 
     private fun readInputData(): Set<Asteroid> {
         val asteroidMap = mutableSetOf<Asteroid>()
 
         javaClass.classLoader.getResourceAsStream(fileName)
-                .reader()
-                .readText()
-                .split("\n")
-                .mapIndexed { y, line ->
-                    line.mapIndexed { x, char ->
-                        if (char == '#') {
-                            asteroidMap.add(Asteroid(x, y))
-                        }
+            .reader()
+            .readText()
+            .split("\n")
+            .mapIndexed { y, line ->
+                line.mapIndexed { x, char ->
+                    if (char == '#') {
+                        asteroidMap.add(Asteroid(x, y))
                     }
                 }
+            }
         return asteroidMap
     }
 
@@ -38,7 +42,7 @@ class StationLocationOptimizer(private val fileName: String) {
 
         asteroidMap.minusElement(asteroid).map { other ->
 
-            if (asteroidMap.any { it.isInLineOfSightBetween(asteroid, other) })
+            if (!other.isVisbleFrom(asteroidMap, asteroid))
                 result--
         }
 
@@ -54,24 +58,29 @@ class StationLocationOptimizer(private val fileName: String) {
         }!!
     }
 
-    fun vaporize(laserStation: Asteroid) {
-        val maxX = asteroidMap.maxBy(Asteroid::x)?.x
-        val maxY = asteroidMap.maxBy(Asteroid::y)?.y
+    fun vaporize() : List<Asteroid> {
 
-        var currentX = laserStation.x
-        var currentY = laserStation.y
+        val laserStation = findBestAsteroid()
+
+        val vaporized = mutableListOf<Asteroid>()
         val map = asteroidMap.toMutableSet()
         while (map.size > 1) {
-
-            for (yPos in currentY downTo 0) {
-                val asteroid = Asteroid(currentX, yPos)
-                if (map.contains(asteroid)) {
-                    if (! map.any { it.isInLineOfSightBetween(asteroid, laserStation) }) {
-                        map.remove(asteroid)
-                    }
-                }
-            }
+            val goner = findNextToVaporize(map, laserStation)
+            map.remove(goner)
+            vaporized.add(goner)
         }
+        return vaporized
+    }
+
+    fun findNextToVaporize(map: Set<Asteroid>, laserStation: Asteroid): Asteroid {
+
+        return map.minusElement(laserStation)
+            .filter { it.isVisbleFrom(map, laserStation) }
+            .maxBy { (it - laserStation).angle() }!!
+    }
+
+    fun Asteroid.isVisbleFrom(map: Set<Asteroid>, other: Asteroid): Boolean {
+        return !map.any { it.isInLineOfSightBetween(this, other) }
     }
 }
 
@@ -104,6 +113,9 @@ data class Asteroid(val x: Int, val y: Int, var visibleCounter: Int = 0) {
 
         return cb.isDependant(ac) && isInDifferentDirection(a, b)
     }
+
+
+
 }
 
 data class Vector(val x: Int, val y: Int) {
@@ -118,6 +130,8 @@ data class Vector(val x: Int, val y: Int) {
         return x / gcd(x, y) == other.x / gcd(other.x, other.y) && y / gcd(x, y) == other.y / gcd(other.x, other.y)
 
     }
+
+    fun angle():Float = atan2(x.toFloat(), y.toFloat())
 
 }
 

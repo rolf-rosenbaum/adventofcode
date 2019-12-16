@@ -2,6 +2,7 @@ package day9
 
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
+import kotlin.math.PI
 
 class StationLocationOptimizerTest {
 
@@ -67,17 +68,6 @@ class StationLocationOptimizerTest {
     }
 
     @Test
-    fun foo() {
-        assertThat(Asteroid(3,2).isInLineOfSightBetween(Asteroid(1,0), Asteroid(4,3))).isTrue()
-    }
-
-    @Test
-    fun name() {
-        val optimizer = StationLocationOptimizer("testmap6.txt")
-        assertThat(optimizer.countVisibleAsteroidsFor(Asteroid(1,0)).visibleCounter).isEqualTo(1)
-    }
-
-    @Test
     fun dependant() {
         assertThat(Vector(2,2).isDependant(Vector(3,3))).isTrue()
         assertThat(Vector(2,1).isDependant(Vector(-4,-2))).isTrue()
@@ -87,5 +77,23 @@ class StationLocationOptimizerTest {
         assertThat(Vector(1,3).isDependant(Vector(-2,-6))).isTrue()
         assertThat(Vector(-1,-1).isDependant(Vector(4,2))).isFalse()
         assertThat(Vector(4,2).isDependant(Vector(-1,-1))).isFalse()
+    }
+
+    @Test
+    fun `find next to vaporize`() {
+        val optimizer = StationLocationOptimizer("testmap3.txt")
+        assertThat(optimizer.findNextToVaporize(optimizer.asteroidMap.toMutableSet(), Asteroid(2,2))).isEqualTo(Asteroid(4,0))
+    }
+
+    @Test
+    fun vaporizeField() {
+
+//        val optimizer = StationLocationOptimizer("testmap3.txt")
+//        assertThat(optimizer.vaporize()).isEqualTo(listOf(Asteroid(3,3), Asteroid(2,2), Asteroid(1,1), Asteroid(0,0)))
+
+        val optimizer2 = StationLocationOptimizer("largeMap.txt")
+        val list = optimizer2.vaporize()
+        val result  = list.get(199).x * 100 + list.get(199).y
+        assertThat(result).isEqualTo(802)
     }
 }
