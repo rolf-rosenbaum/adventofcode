@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
     jcenter()
 }
+tasks.test {
+    useJUnitPlatform()
+}
+
 
 dependencies {
     // Use the Kotlin JDK 8 standard library.

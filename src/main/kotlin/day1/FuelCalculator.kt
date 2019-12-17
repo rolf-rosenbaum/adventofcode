@@ -19,8 +19,22 @@ class FuelCalculator(val fileName: String) {
                     .readLines()
                     .map { it.toInt() }
 
-    fun calculateFuelForModule(mass: Int): Int {
+    fun calculateFuelFor(mass: Int): Int {
         return mass / 3 - 2
+    }
+
+    fun calculateFuelForModule(mass: Int) : Int{
+        val fuelForModule =  calculateFuelFor(mass)
+        return fuelForModule + calculateFuelForFuel(fuelForModule)
+    }
+
+    fun calculateFuelForFuel(fuel: Int): Int {
+        val fuelForFuel = calculateFuelFor(fuel)
+        return if (fuelForFuel < 0) {
+            0
+        } else {
+            fuelForFuel + calculateFuelForFuel(fuelForFuel)
+        }
     }
 
     fun calculateFuelForAllModules(): Int {
