@@ -1,4 +1,4 @@
-package day9
+package day10
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
