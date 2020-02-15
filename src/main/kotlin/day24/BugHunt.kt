@@ -8,7 +8,7 @@ fun main() {
 
     val world = World("eris.txt")
 
-    world.generations2(200)
+    world.generations2(50)
 
 
 }
@@ -96,36 +96,21 @@ class World(private val fileName: String) {
         it.x in 0..4 && it.y in 0..4
     }.toSet()
 
-    private fun Cell.countNeighboursForOuter(): Int {
-        return 0
-    }
+    private fun Cell.countNeighbours() = countInnerLayer() + countOuterLayer() + countThisLayer()
 
-    private fun Cell.countNeighboursForInner(): Int {
-        return 0
-    }
-
-    private fun Cell.countNeighbours(): Int {
-
-
-        val specialCells = listOf(Cell(2, 1, layer), Cell(1, 2, layer), Cell(2, 3, layer), Cell(3, 2, layer))
-        var count = 0
-        count += countInner() + countOuter()
-
-        count += livingCells.intersect(
-            listOf(
-                Cell(x, y + 1, layer),
-                Cell(x, y - 1, layer),
-                Cell(x - 1, y, layer),
-                Cell(x + 1, y, layer)
-            )
+    private fun Cell.countThisLayer(): Int {
+        return livingCells.intersect(
+                listOf(
+                        Cell(x, y + 1, layer),
+                        Cell(x, y - 1, layer),
+                        Cell(x - 1, y, layer),
+                        Cell(x + 1, y, layer)
+                )
         ).minus(Cell(2, 2, layer))
-            .size
-
-        return count
-
+                .size
     }
 
-    private fun Cell.countOuter(): Int {
+    private fun Cell.countOuterLayer(): Int {
         var count = 0
         if (y == 0) {
             count += livingCells.intersect(listOf(Cell(2, 1, layer - 1))).size
@@ -145,9 +130,8 @@ class World(private val fileName: String) {
         return count
     }
 
-
-    private fun Cell.countInner(): Int {
-        var neighbours = mutableSetOf<Cell>()
+    private fun Cell.countInnerLayer(): Int {
+        val neighbours = mutableSetOf<Cell>()
 
         if (x == 2 && y == 1) {
             neighbours.addAll(
@@ -199,7 +183,6 @@ class World(private val fileName: String) {
             )
         }
         return livingCells.intersect(neighbours).size
-
     }
 
     fun generations2(gen: Int) {
