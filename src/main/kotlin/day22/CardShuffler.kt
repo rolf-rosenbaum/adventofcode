@@ -32,7 +32,9 @@ private fun partTwo(): String {
             .map { toShuffleCommand(it) }
 
 
-    commandList.map { cardShuffler.executeCommand(it) }
+    commandList
+        .asSequence()
+        .map { cardShuffler.executeCommand(it) }
 
 
     return "Position of Card 2019 is ${cardShuffler.deck.indexOf(2019)}"
